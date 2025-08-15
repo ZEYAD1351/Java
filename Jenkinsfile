@@ -32,7 +32,7 @@ node {
     }
 
     stage("push docker image") {
-        withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+        withCredentials([usernamePassword(credentialsId: 'docker-username', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
             sh """
                 echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
                 docker push iti-java:${BUILD_NUMBER}
