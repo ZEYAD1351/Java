@@ -76,7 +76,7 @@ pipeline {
                         branches: [[name: '*/main']],
                         extensions: [],
                         userRemoteConfigs: [[
-                            url: 'https://github.com/ZEYAD1351/argocd.git',
+                            url: 'git@github.com:ZEYAD1351/argocd.git',
                             credentialsId: 'git-cred'  // Jenkins credential for GitHub access
                         ]]
                     ])
