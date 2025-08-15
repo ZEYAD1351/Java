@@ -39,10 +39,8 @@ node {
                 passwordVariable: 'DOCKER_PASS'
             )
         ]) {
-            sh """
-                docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
-                docker push iti-java:${BUILD_NUMBER}
-            """
+            sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+            sh "docker push iti-java:${BUILD_NUMBER}"
         }
     }
     stage("push java app image"){
