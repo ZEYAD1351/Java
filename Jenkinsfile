@@ -86,7 +86,7 @@ pipeline {
 
                 // Commit and push changes
                     withCredentials([usernamePassword(
-                        credentialsId: 'git-cred'
+                        credentialsId: 'git-cred',
                         usernameVariable: 'GIT_USER',
                         passwordVariable: 'GIT_TOKEN'
                     )]) {
