@@ -31,5 +31,15 @@ node {
         def docker = new com.iti.docker()
         docker.build("iti-java", "${BUILD_NUMBER}")
     }
-   
+    stage("push java app image"){
+        def docker = new com.iti.docker()
+        docker.login("${DOCKER_USER}", "${DOCKER_PASS}")
+        docker.push("iti-java", "${BUILD_NUMBER}")
+    }
+    stage("push java app image"){
+        sh "mkdir argocd"
+        sh "cd argocd"
+        checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ZEYAD1351/argocd.git']])
+        sh "sed -i 's#image: .*#image: iti-java:${BUILD_NUMBER}#' iti-dev/deployment.yaml"
+    }
 }
