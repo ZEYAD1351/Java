@@ -34,7 +34,7 @@ node {
     stage("push java app image"){
         def docker = new com.iti.docker()
         docker.login("${DOCKER_USER}", "${DOCKER_PASS}")
-        docker.push("iti-java", "${BUILD_NUMBER}")
+        docker.push("iti-java", "${BUILD_NUMBER}")  // <-- Problem likely here
     }
     stage("push java app image"){
         sh "mkdir argocd"
