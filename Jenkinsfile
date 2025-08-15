@@ -13,6 +13,7 @@ pipeline {
         DOCKER_USER = credentials('docker-username')
         DOCKER_PASS = credentials('docker-password')
         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
+        DOCKER_IMAGE = "zeyad135/iti-java"  // Add your Docker Hub username if needed
     }
 
     stages {
@@ -47,7 +48,7 @@ pipeline {
             steps {
                 script {
                     def docker = new com.iti.docker()
-                    docker.build("iti-java", "${BUILD_NUMBER}")
+                    docker.build("${env.DOCKER_IMAGE}", "${BUILD_NUMBER}")
                 }
             }
         }
@@ -56,8 +57,10 @@ pipeline {
             steps {
                 script {
                     def docker = new com.iti.docker()
-                    docker.login("${env.DOCKER_USER}", "${env.DOCKER_PASS}")
-                    docker.push("iti-java", "${BUILD_NUMBER}")
+                    // More secure login method
+                    sh "echo ${env.DOCKER_PASS} | docker login -u ${env.DOCKER_USER} --password-stdin"
+                    // Push with your Docker Hub username in the tag
+                    docker.push("${env.DOCKER_IMAGE}", "${BUILD_NUMBER}")
                 }
             }
         }
@@ -71,7 +74,7 @@ pipeline {
                         extensions: [], 
                         userRemoteConfigs: [[url: 'https://github.com/ZEYAD1351/argocd.git']]
                     )
-                    sh "sed -i 's#        image: .*#        image: iti-java:${BUILD_NUMBER}#' iti-dev/deployment.yaml"
+                    sh "sed -i 's#        image: .*#        image: ${env.DOCKER_IMAGE}:${BUILD_NUMBER}#' iti-dev/deployment.yaml"
                 }
             }
         }
