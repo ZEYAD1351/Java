@@ -31,8 +31,8 @@ node {
         def docker = new com.iti.docker()
         docker.build("iti-java", "${BUILD_NUMBER}")
     }
-    stage("push java app image") {
-        sh 'echo "Hello World"'  // Does this work?
+   stage("push java app image") {
+        sh "echo ${DOCKER_USER}"  // Check if this prints the username correctly
     }
     stage("push java app image"){
         sh "mkdir argocd"
