@@ -94,6 +94,7 @@ pipeline {
                             git config user.email "zeyadmohammed0966@gmail.com"
                             git config user.name "ZEYAD1351"
                             git config user.password "${GIT_TOKEN}"
+                            git checkout main
                             git add iti-dev/deployment.yaml
                             git commit -m "Update image to ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}"
                             pwd
