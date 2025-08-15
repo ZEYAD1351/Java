@@ -65,18 +65,42 @@ pipeline {
             }
         }
         
-        stage("Update ArgoCD manifest") {
-            steps {
+       stage("Update ArgoCD manifest") {
+           steps {
+                script {
+                // Clone the ArgoCD repo
                 sh "mkdir -p argocd"
                 dir('argocd') {
-                    checkout scmGit(
-                        branches: [[name: '*/main']], 
-                        extensions: [], 
-                        userRemoteConfigs: [[url: 'https://github.com/ZEYAD1351/argocd.git']]
-                    )
-                    sh "sed -i 's#        image: .*#        image: ${env.DOCKER_IMAGE}:${BUILD_NUMBER}#' iti-dev/deployment.yaml"
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: '*/main']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/ZEYAD1351/argocd.git',
+                            credentialsId: 'git-cred'  // Jenkins credential for GitHub access
+                        ]]
+                    ])
+
+                    // Update the image tag in deployment.yaml
+                    sh "sed -i 's#        image: .*#        image: ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}#' iti-dev/deployment.yaml"
+
+                // Commit and push changes
+                    withCredentials([usernamePassword(
+                        credentialsId: 'git-cred',
+                        usernameVariable: 'GIT_USER',
+                        passwordVariable: 'GIT_TOKEN'
+                    )]) {
+                        sh """
+                            git config user.email "jenkins@example.com"
+                            git config user.name "Jenkins"
+                            git add iti-dev/deployment.yaml
+                            git commit -m "Update image to ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}"
+                            git push https://${GIT_USER}:${GIT_TOKEN}@github.com/ZEYAD1351/argocd.git main
+                        """
+                    }
                 }
             }
-        }
+    }
+}
     }
 }
