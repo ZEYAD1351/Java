@@ -95,7 +95,7 @@ pipeline {
                             git config user.name "ZEYAD1351"
                             git add iti-dev/deployment.yaml
                             git commit -m "Update image to ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}"
-                            git push https://${GIT_USER}:${GIT_TOKEN}@github.com/ZEYAD1351/argocd.git HEAD:main
+                            git push https://${GIT_USER}:${GIT_TOKEN}@github.com/ZEYAD1351/argocd.git main
                         """
                     }
                 }
