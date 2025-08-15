@@ -1,49 +1,79 @@
 @Library('iti-sharedlib')_
 
-properties([
-    disableConcurrentBuilds()
-])
-
-node {
-    def javaHome = tool name: 'java-11', type: 'jdk'
-    def mavenHome = tool name: 'mvn-3-5-4', type: 'maven'
-
-    stage("Get code") {
-        checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ZEYAD1351/java.git']])
+pipeline {
+    agent any
+    
+    options {
+        disableConcurrentBuilds()
     }
 
-    stage("build app") {
-        env.JAVA_HOME = javaHome
-        env.PATH = "${javaHome}/bin:${mavenHome}/bin:${env.PATH}"
-        sh 'java -version'
-        sh 'mvn -version'
-
-        def mavenBuild = new org.iti.mvn()
-        mavenBuild.javaBuild("package install")
+    environment {
+        JAVA_HOME = tool name: 'java-11', type: 'jdk'
+        MAVEN_HOME = tool name: 'mvn-3-5-4', type: 'maven'
+        DOCKER_USER = credentials('docker-username')
+        DOCKER_PASS = credentials('docker-password')
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
     }
 
-    stage("archive app") {
-        archiveArtifacts artifacts: '**/*.jar', followSymlinks: false
-    }
-
-   stage("docker build") {
-        def docker = new com.iti.docker()
-        docker.build("zeyad135/iti-java", "${BUILD_NUMBER}")  // Changed to your Docker Hub username
-    }
-
-    stage("push docker image") {
-        withCredentials([usernamePassword(credentialsId: 'docker-username', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-            sh """
-                echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
-                docker push zeyad135/iti-java:${BUILD_NUMBER}  // Updated to match build
-            """
+    stages {
+        stage("Get code") {
+            steps {
+                checkout scmGit(
+                    branches: [[name: '*/master']], 
+                    extensions: [], 
+                    userRemoteConfigs: [[url: 'https://github.com/ZEYAD1351/java.git']]
+                )
+            }
         }
-    }
-
-    stage("update ArgoCD manifest") {
-        dir('argocd') {
-            checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ZEYAD1351/argocd.git']])
-            sh "sed -i 's#image: .*#image: iti-java:${BUILD_NUMBER}#' iti-dev/deployment.yaml"
+        
+        stage("Build app") {
+            steps {
+                sh 'java -version'
+                sh 'mvn -version'
+                script {
+                    def mavenBuild = new org.iti.mvn()
+                    mavenBuild.javaBuild("package install")
+                }
+            }
+        }
+        
+        stage("Archive app") {
+            steps {
+                archiveArtifacts artifacts: '**/*.jar', followSymlinks: false
+            }
+        }
+        
+        stage("Docker build") {
+            steps {
+                script {
+                    def docker = new com.iti.docker()
+                    docker.build("iti-java", "${BUILD_NUMBER}")
+                }
+            }
+        }
+        
+        stage("Push java app image") {
+            steps {
+                script {
+                    def docker = new com.iti.docker()
+                    docker.login("${env.DOCKER_USER}", "${env.DOCKER_PASS}")
+                    docker.push("iti-java", "${BUILD_NUMBER}")
+                }
+            }
+        }
+        
+        stage("Update ArgoCD manifest") {
+            steps {
+                sh "mkdir -p argocd"
+                dir('argocd') {
+                    checkout scmGit(
+                        branches: [[name: '*/main']], 
+                        extensions: [], 
+                        userRemoteConfigs: [[url: 'https://github.com/ZEYAD1351/argocd.git']]
+                    )
+                    sh "sed -i 's#        image: .*#        image: iti-java:${BUILD_NUMBER}#' iti-dev/deployment.yaml"
+                }
+            }
         }
     }
 }
