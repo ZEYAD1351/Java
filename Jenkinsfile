@@ -32,11 +32,18 @@ node {
         docker.build("iti-java", "${BUILD_NUMBER}")
     }
    stage("push java app image") {
-    // Option 1: Direct docker push (simplest)
-        sh """
-            docker login -u '${DOCKER_USER}' -p '${DOCKER_PASS}'
-            docker push iti-java:${BUILD_NUMBER}
-        """
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'docker-username',
+                usernameVariable: 'DOCKER_USER',
+                passwordVariable: 'DOCKER_PASS'
+            )
+        ]) {
+            sh """
+                docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
+                docker push iti-java:${BUILD_NUMBER}
+            """
+        }
     }
     stage("push java app image"){
         sh "mkdir argocd"
