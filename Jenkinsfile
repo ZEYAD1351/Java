@@ -26,16 +26,16 @@ node {
         archiveArtifacts artifacts: '**/*.jar', followSymlinks: false
     }
 
-    stage("docker build") {
+   stage("docker build") {
         def docker = new com.iti.docker()
-        docker.build("iti-java", "${BUILD_NUMBER}")
+        docker.build("zeyad135/iti-java", "${BUILD_NUMBER}")  // Changed to your Docker Hub username
     }
 
     stage("push docker image") {
         withCredentials([usernamePassword(credentialsId: 'docker-username', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
             sh """
                 echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
-                docker push iti-java:${BUILD_NUMBER}
+                docker push zeyad135/iti-java:${BUILD_NUMBER}  // Updated to match build
             """
         }
     }
