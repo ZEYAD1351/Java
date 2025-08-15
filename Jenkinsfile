@@ -91,8 +91,8 @@ pipeline {
                         passwordVariable: 'GIT_TOKEN'
                     )]) {
                         sh """
-                            git config user.email "jenkins@example.com"
-                            git config user.name "Jenkins"
+                            git config user.email "zeyadmohammed0966@gmail.com"
+                            git config user.name "ZEYAD1351"
                             git add iti-dev/deployment.yaml
                             git commit -m "Update image to ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}"
                             git push https://${GIT_USER}:${GIT_TOKEN}@github.com/ZEYAD1351/argocd.git main
