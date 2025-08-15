@@ -40,6 +40,6 @@ node {
         sh "mkdir argocd"
         sh "cd argocd"
         checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ZEYAD1351/argocd.git']])
-        sh "sed -i #        image: .*#        image: iti-java:${BUILD_NUMBER}# iti-dev/deployment.yaml"
+        sh "sed -i 's#image: .*#image: iti-java:${BUILD_NUMBER}#' iti-dev/deployment.yaml"
     }
 }
