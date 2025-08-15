@@ -32,10 +32,8 @@ node {
         docker.build("iti-java", "${BUILD_NUMBER}")
     }
    stage("push java app image") {
-        steps {
-            sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
-            sh "docker push iti-java:${BUILD_NUMBER}"
-        }
+        sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+        sh "docker push iti-java:${BUILD_NUMBER}"
     }
     stage("push java app image"){
         sh "mkdir argocd"
