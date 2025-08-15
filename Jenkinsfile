@@ -31,13 +31,12 @@ node {
         def docker = new com.iti.docker()
         docker.build("iti-java", "${BUILD_NUMBER}")
     }
-   stage("push java app image") {
-        sh "echo ${DOCKER_USER}"  // Check if this prints the username correctly
-    }
     stage("push java app image"){
-        sh "mkdir argocd"
-        sh "cd argocd"
-        checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ZEYAD1351/argocd.git']])
-        sh "sed -i 's#image: .*#image: iti-java:${BUILD_NUMBER}#' iti-dev/deployment.yaml"
+        def docker = new com.iti.docker()
+        docker.login("${DOCKER_USER}", "${DOCKER_PASS}")
+        docker.push("iti-java", "${BUILD_NUMBER}")
+    }
+    stage("push java app image") {
+        sh 'echo "Hello World"'  // Does this work?
     }
 }
