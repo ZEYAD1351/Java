@@ -98,7 +98,7 @@ pipeline {
                             git commit -m "Update image to ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}"
                             pwd
                             ls
-                            git push origin main
+                            git push -u origin main
                         """
                     }
                 }
