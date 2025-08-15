@@ -32,13 +32,7 @@ node {
         docker.build("iti-java", "${BUILD_NUMBER}")
     }
    stage("push java app image") {
-        withCredentials([
-            usernamePassword(
-                credentialsId: 'docker-username',
-                usernameVariable: 'DOCKER_USER',
-                passwordVariable: 'DOCKER_PASS'
-            )
-        ]) {
+        steps {
             sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
             sh "docker push iti-java:${BUILD_NUMBER}"
         }
