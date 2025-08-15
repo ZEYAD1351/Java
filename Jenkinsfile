@@ -31,10 +31,12 @@ node {
         def docker = new com.iti.docker()
         docker.build("iti-java", "${BUILD_NUMBER}")
     }
-    stage("push java app image"){
-        def docker = new com.iti.docker()
-        docker.login("${DOCKER_USER}", "${DOCKER_PASS}")
-        docker.push("iti-java", "${BUILD_NUMBER}")
+   stage("push java app image") {
+    // Option 1: Direct docker push (simplest)
+        sh """
+            docker login -u '${DOCKER_USER}' -p '${DOCKER_PASS}'
+            docker push iti-java:${BUILD_NUMBER}
+        """
     }
     stage("push java app image"){
         sh "mkdir argocd"
