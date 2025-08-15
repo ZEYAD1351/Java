@@ -83,7 +83,8 @@ pipeline {
 
                     // Update the image tag in deployment.yaml
                     sh "sed -i 's#        image: .*#        image: ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}#' iti-dev/deployment.yaml"
-
+                    sh "cat iti-dev/deployment.yaml"
+                    sh "ls"
                 // Commit and push changes
                     withCredentials([usernamePassword(
                         credentialsId: 'git-cred',
