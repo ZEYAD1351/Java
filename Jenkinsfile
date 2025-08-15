@@ -76,7 +76,7 @@ pipeline {
                         branches: [[name: '*/main']],
                         extensions: [],
                         userRemoteConfigs: [[
-                            url: 'git@github.com:ZEYAD1351/argocd.git',
+                            url: 'https://github.com/ZEYAD1351/argocd.git',
                             credentialsId: 'git-cred'  // Jenkins credential for GitHub access
                         ]]
                     ])
@@ -89,19 +89,12 @@ pipeline {
                         credentialsId: 'git-cred',
                         usernameVariable: 'GIT_USER',
                         passwordVariable: 'GIT_TOKEN'
-                    )]) {
+                )]) {
                         sh """
-                            git config user.email "zeyadmohammed0966@gmail.com"
-                            git config user.name "ZEYAD1351"
-                            git config user.password "${GIT_TOKEN}"
-                            git checkout main
-                            git add iti-dev/deployment.yaml
-                            git commit -m "Update image to ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}"
-                            pwd
-                            ls
-                            git push -u origin main
-                        """
-                    }
+                            git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/ZEYAD1351/argocd.git
+                            git push origin HEAD:main
+                            """
+                }
                 }
             }
     }
