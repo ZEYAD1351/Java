@@ -77,7 +77,7 @@ pipeline {
                         extensions: [],
                         userRemoteConfigs: [[
                             url: 'https://github.com/ZEYAD1351/argocd.git',
-                            credentialsId: 'git-cred'  // Jenkins credential for GitHub access
+                              // Jenkins credential for GitHub access
                         ]]
                     ])
 
@@ -86,7 +86,7 @@ pipeline {
 
                 // Commit and push changes
                     withCredentials([usernamePassword(
-                        credentialsId: 'git-cred',
+                        
                         usernameVariable: 'GIT_USER',
                         passwordVariable: 'GIT_TOKEN'
                     )]) {
